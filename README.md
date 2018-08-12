@@ -1,4 +1,4 @@
-# CDC
+# CD_Computation
 Toolbox containing scripts for computation
 
 Maintained by Duo Chan, Harvard University
