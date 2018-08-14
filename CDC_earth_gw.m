@@ -9,7 +9,7 @@
 %
 % Output is the geostrophic wind in unit of m/s
 %  
-% Last update: 2018-08-10
+% Last update: 2018-08-14
 
 function [u,v] = CDC_earth_gw(input,lon,lat,varname,mass)
     
@@ -32,10 +32,13 @@ function [u,v] = CDC_earth_gw(input,lon,lat,varname,mass)
             rho = 1023;
     end
 
-    dx = CDC_earth_grad(input,1,lon,lat,1) / 10e5;
-    dy = CDC_earth_grad(input,2,lon,lat,1) / 10e5;
+    dx = CDC_earth_grad(input,1,lon,lat,1) / 1e5;
+    dy = CDC_earth_grad(input,2,lon,lat,1) / 1e5;
     
     f = 2 .* sin(lat/180*pi) .* 7.29e-5;
+    rep_list = size(input);
+    rep_list(1:2) = 1;
+    f = repmat(f,rep_list);
     
     switch varname,   
         case 'pres',
