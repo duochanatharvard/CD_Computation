@@ -4,7 +4,7 @@
 % Input are:
 %  - input: should have the dimension of longitude x latitude
 %  - lon and lat: longitude and latitude, in unit of degree
-%  - varname: pres (default) or hgt height
+%  - varname: pres (Pa: default) or hgt height (m)
 %  - mass: air (default) or water
 %
 % Output is the geostrophic wind in unit of m/s
