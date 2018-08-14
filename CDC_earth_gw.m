@@ -1,6 +1,6 @@
 % output = CDC_earth_gw(input,lon,lat,varname,mass)
 %
-% CDC_earth_grad compute the gradient over longitude or latitude
+% CDC_earth_gw compute the geostrophic wind
 % Input are:
 %  - input: should have the dimension of longitude x latitude
 %  - lon and lat: longitude and latitude, in unit of degree
