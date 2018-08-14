@@ -1,4 +1,4 @@
-% output = CDC_earth_grad(input,dim,lon,lat,scale)
+% output = CDC_earth_grad(input,dim,lon,lat,scale,do_regress)
 %
 % CDC_earth_grad compute the gradient over longitude or latitude
 % Input are:
@@ -6,15 +6,23 @@
 %  - dim: on which dimension to compute the gradient
 %  - lon and lat: longitude and latitude, in unit of degree
 %  - scale: over which length is the gradient computed, unit: boxes
+%  - do_regress: whether use regression to find grad.      default: 0
 %
 % Output is the gradient in unit of ~ 100km^-1.
 %  
 % Last update: 2018-08-09
 
-function output = CDC_earth_grad(input,dim,lon,lat,scale)
+function output = CDC_earth_grad(input,dim,lon,lat,scale,do_regress)
 
+    % ************************************
+    % Parse input 
+    % ************************************
     if ~exist('scale','var')
         scale = 1;
+    end
+
+    if ~exist('do_regress','var')
+        do_regress = 0;
     end
     
     if min(size(lon)) == 1,
@@ -25,45 +33,80 @@ function output = CDC_earth_grad(input,dim,lon,lat,scale)
         error('Not differenciating over longitude or latitude');
     end
 
-    if dim == 1,
-
-        input_ex = [input(end-scale+1:end,:,:,:,:,:,:); input;...
-                                            input(1:scale,:,:,:,:,:,:)];
-                                        
-        lon_ex   = [lon(end-scale+1:end,:,:,:,:,:,:) - 360; lon;...
-                                            lon(1:scale,:,:,:,:,:,:) + 360];
-        
-        diff_input = input_ex(1+scale*2:end,:,:,:,:,:,:) - ...
-                                        input_ex(1:end-scale*2,:,:,:,:,:,:);
-                                    
-        diff_dist  = lon_ex(1+scale*2:end,:,:,:,:,:,:) - ...
-                                        lon_ex(1:end-scale*2,:,:,:,:,:,:);
-                                    
-        rep_list = size(input);
-        rep_list(1:2) = 1;
-        diff_dist  = repmat(diff_dist .* cos(lat/180*pi),rep_list);
-        
-    elseif dim == 2,
-
-        rep_list = ones(1,numel(size(input)));
-        rep_list(2) = scale;
-        
-        input_ex = [repmat(input(:,1,:,:,:,:,:),rep_list), input,...
-                                   repmat(input(:,end,:,:,:,:,:),rep_list)];  
-                               
-        lat_ex   = [repmat(lat(:,1,:,:,:,:,:),rep_list), lat,...
-                                   repmat(lat(:,end,:,:,:,:,:),rep_list)];
-
-        diff_input = input_ex(:,1+scale*2:end,:,:,:,:,:) -  ...
-                                   input_ex(:,1:end-scale*2,:,:,:,:,:);
-                               
-        diff_dist  = lat_ex(:,1+scale*2:end,:,:,:,:,:) - ...
-                                   lat_ex(:,1:end-scale*2,:,:,:,:,:);
-
-        rep_list = size(input);
-        rep_list(1:2) = 1;
-        diff_dist  = repmat(diff_dist,rep_list);
-    end
+    % ************************************
+    % Compute gradient 
+    % ************************************
+    N = size(input,dim);
+    N_dim = numel(size(input));
+    rep_list = size(input);
+    rep_list(1:2) = 1;
     
-    output = diff_input ./ (diff_dist * 1.11);
+    if do_regress == 0,  % This only uses two points
+        
+        if dim == 1,
+                
+            l_1 = [N-scale+1:N 1:N-scale];
+            l_2 = [1+scale:N 1:scale];
+            diff_input = CDC_subset(input,dim,l_2) - CDC_subset(input,dim,l_1);
+            diff_dist  = CDC_subset(lon,dim,l_2) - CDC_subset(lon,dim,l_1);
+            diff_dist  = repmat(diff_dist .* cos(lat/180*pi),rep_list);
+
+        elseif dim == 2,
+
+            l_1 = [ones(1,scale)*1 1:N-scale];
+            l_2 = [1+scale:N ones(1,scale)*N];
+            diff_input = CDC_subset(input,dim,l_2) - CDC_subset(input,dim,l_1);
+            diff_dist  = CDC_subset(lat,dim,l_2) - CDC_subset(lat,dim,l_1);
+            diff_dist  = repmat(diff_dist,rep_list);
+        end
+        
+        output = diff_input ./ (diff_dist * 1.11);
+        
+    else % Use regression to find the gradient
+        
+        input_temp = nan([size(input),scale*2+1]);
+        postn_temp = nan([size(input),scale*2+1]);
+        
+        if dim == 1,
+            postn = repmat(lon,rep_list);
+        else
+            postn = repmat(lat,rep_list);
+        end
+        
+        ct = 0;
+        for s_cur = 0:scale
+
+            ct = ct + 1;
+            if dim == 1,
+                l = [1+s_cur:N 1:s_cur];
+            else
+                l = [ones(1,s_cur)*1 1:N-s_cur];
+            end
+            temp = CDC_subset(input,dim,l);
+            input_temp = CDC_assign(input_temp,temp,N_dim+1,ct);
+            temp = CDC_subset(postn,dim,l);
+            postn_temp = CDC_assign(postn_temp,temp,N_dim+1,ct);
+            
+            if s_cur ~= 0,
+                ct = ct + 1;
+                if dim == 1,
+                    l = [N-s_cur+1:N 1:N-s_cur];
+                else
+                    l = [1+s_cur:N ones(1,s_cur)*N];
+                end
+                temp = CDC_subset(input,dim,l);
+                input_temp = CDC_assign(input_temp,temp,N_dim+1,ct);
+                temp = CDC_subset(postn,dim,l);
+                postn_temp = CDC_assign(postn_temp,temp,N_dim+1,ct);
+            end
+        end
+        
+        output = CDC_trend(input_temp,postn_temp,N_dim+1);
+        output = output{1};
+        if dim == 1,
+            output = output ./ 1.11 ./ repmat(cos(lat/180*pi),rep_list);
+        else
+            output = output ./ 1.11;
+        end
+    end    
 end
