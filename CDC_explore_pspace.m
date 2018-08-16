@@ -28,7 +28,7 @@
 %     b_grid = [-0.1 : 0.0005 : 0.1]*5;
 %     V = eye(100);
 %     sigma_2 = MSE;
-%     log_L = CDC_explore_pspace([A ones(100,1)],B,V,sigma_2,b(1),b(2),a_grid,b_grid);
+%     log_L = CDC_expolre_pspace([A ones(100,1)],B,V,sigma_2,b(1),b(2),a_grid,b_grid);
 %     P = CDC_prob(log_L);
 %     contourf(b(1)+a_grid,b(2)+b_grid,P','linest','none')
 %     [out_int,out_para,MLE] = CDC_conf_int(b(1)+a_grid,b(2)+b_grid,[],P,0.8);

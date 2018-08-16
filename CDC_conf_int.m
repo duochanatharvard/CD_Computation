@@ -57,17 +57,17 @@ function [out_int,out_para,MLE] = CDC_conf_int(x,y,z,val_pdf,alpha)
     
     out_int(I(1:id)) = true;
     
-    id = find(val_pdf == max(val_pdf(:)));
+    id2 = find(val_pdf == max(val_pdf(:)));
 
     if dim == 1,
         out_para = [xx(I(1:id)) val_pdf(I(1:id))];
-        MLE = [xx(id)];
+        MLE = [xx(id2)];
     elseif dim == 2,
         out_para = [xx(I(1:id)) yy(I(1:id)) val_pdf(I(1:id))];
-        MLE = [xx(id)  yy(id)];
+        MLE = [xx(id2)  yy(id2)];
     else
         out_para = [xx(I(1:id)) yy(I(1:id)) zz(I(1:id)) val_pdf(I(1:id))];
-        MLE = [xx(id)  yy(id)  zz(id)];
+        MLE = [xx(id2)  yy(id2)  zz(id2)];
     end
 
 end
