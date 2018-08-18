@@ -41,6 +41,7 @@ function CDC
     disp('    CDC_expolre_pspace     % Explore the parameter space of linear fit')
     disp('    CDC_prob               % Normalize probability density function')
     disp('    CDC_conf_int           % high dimensional confidence interval')
+    disp('    CDC_mcmc_sampler       % MCMC sampler that takes in L in matrix form')
     disp(' ')
     disp(' ')
     disp('Earth Science:')  
