@@ -48,27 +48,29 @@ function [output,output_sig,fitted] = CDC_trend(field_y,field_x,dim)
     slope = cov_xy ./ var_xx;
     intercept = nanmean(field_y,dim) - nanmean(field_x,dim) .* slope;
 
-    % *****************************************************************
-    % Compute MSE
-    % *****************************************************************
-    fitted = repmat(slope,dim_list) .* field_x + repmat(intercept,dim_list);
-    err  = CDC_nansum((fitted - field_y).^2,dim) ./ (l_effect - 1);
-    
-    x_sqrt_2 = CDC_nansum(field_anm_x.^2,dim);
-    mu_sqrt_2 = nanmean(field_x,dim).^2;
-    
-    output_std = sqrt(err ./ x_sqrt_2);
-    intercept_std    = sqrt(err .* (1 ./ (l_effect + 1) + mu_sqrt_2 ./ x_sqrt_2));
-    
-    n_std = tinv(0.975,l_effect-1);
+    if nargout > 1,
+        % *****************************************************************
+        % Compute MSE
+        % *****************************************************************
+        fitted = repmat(slope,dim_list) .* field_x + repmat(intercept,dim_list);
+        err  = CDC_nansum((fitted - field_y).^2,dim) ./ (l_effect - 1);
 
-    % *****************************************************************
-    % Compute significance level
-    % *****************************************************************    
-    slope_upper       =    output_std .* n_std + slope;
-    slope_lower       =  - output_std .* n_std + slope;
-    intercept_upper   =    intercept_std .* n_std + intercept;
-    intercept_lower   =  - intercept_std .* n_std + intercept;
+        x_sqrt_2 = CDC_nansum(field_anm_x.^2,dim);
+        mu_sqrt_2 = nanmean(field_x,dim).^2;
+
+        output_std = sqrt(err ./ x_sqrt_2);
+        intercept_std    = sqrt(err .* (1 ./ (l_effect + 1) + mu_sqrt_2 ./ x_sqrt_2));
+
+        n_std = tinv(0.975,l_effect-1);
+
+        % *****************************************************************
+        % Compute significance level
+        % *****************************************************************    
+        slope_upper       =    output_std .* n_std + slope;
+        slope_lower       =  - output_std .* n_std + slope;
+        intercept_upper   =    intercept_std .* n_std + intercept;
+        intercept_lower   =  - intercept_std .* n_std + intercept;
+    end
     
     % *****************************************************************
     % Prepare output
@@ -76,10 +78,12 @@ function [output,output_sig,fitted] = CDC_trend(field_y,field_x,dim)
     output{1} = slope;
     output{2} = intercept;
     
-    output_sig{1}.upper = slope_upper;
-    output_sig{1}.lower = slope_lower;
-
-    output_sig{2}.upper = intercept_upper;
-    output_sig{2}.lower = intercept_lower;
+    if nargout > 1,
+        output_sig{1}.upper = slope_upper;
+        output_sig{1}.lower = slope_lower;
+        
+        output_sig{2}.upper = intercept_upper;
+        output_sig{2}.lower = intercept_lower;
+    end
 
 end
