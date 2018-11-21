@@ -101,13 +101,15 @@ function output = CDC_earth_grad(input,dim,lon,lat,scale,do_regress)
             end
         end
         
-        temp = postn_temp(1:scale,:,:,:,:,:);
-        temp(temp > 300) = temp(temp > 300) - 360;
-        postn_temp(1:scale,:,:,:,:,:) = temp;
-        
-        temp = postn_temp(end-scale+1:end,:,:,:,:,:);
-        temp(temp < 60) = temp(temp < 60) + 360;
-        postn_temp(end-scale+1:end,:,:,:,:,:) = temp;        
+        if dim == 1,
+            temp = postn_temp(1:scale,:,:,:,:,:);
+            temp(temp > 300) = temp(temp > 300) - 360;
+            postn_temp(1:scale,:,:,:,:,:) = temp;
+
+            temp = postn_temp(end-scale+1:end,:,:,:,:,:);
+            temp(temp < 60) = temp(temp < 60) + 360;
+            postn_temp(end-scale+1:end,:,:,:,:,:) = temp;        
+        end
         
         output = CDC_trend(input_temp,postn_temp,N_dim+1);
         output = output{1};
