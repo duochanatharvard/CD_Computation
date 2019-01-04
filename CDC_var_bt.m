@@ -64,8 +64,8 @@ function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field
     % **************************************************
     % Correct for underestimation
     % ************************************************** 
-    out_member = out_member * size(field_1,N) / (size(field_1,N)-1);
-    size(field_1,N)
+    out_member = out_member * size(field_1,dim) / (size(field_1,dim)-1);
+    size(field_1,dim)
  
     % **************************************************
     % Correct for underestimation
