@@ -1,4 +1,4 @@
-% [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field_2)
+% [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field_2,N_block)
 % 
 % output variables are:
 % - output:     variance
@@ -11,9 +11,9 @@
 % Bootstrapped data are corrected to account for the underestimation due to
 % re-sampling.
 % 
-% Last update: 2018-08-23
+% Last update: 2018-11-24
 
-function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field_2)
+function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field_2,N_block)
 
     % **************************************************
     % Parsing the data
@@ -26,7 +26,11 @@ function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field
     
     if nargin < 4,
         field_2 = field_1;
+    elseif isempty(field_2),
+        field_2 = field_1;
     end
+
+    if ~exist('N_block','var'), N_block = 1; end
 
     % **************************************************
     % Compute sample variance
@@ -37,7 +41,7 @@ function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field
     % Bootstrap for the order 
     % **************************************************
     rng(0);
-    [~,boot_sample] = bootstrp(N, @(x) [mean(x)], [1:size(field_1,dim)]);
+    [~,boot_sample] = bootstrp(N, @(x) [mean(x)], [1:size(field_1,dim)/N_block]);
     
     % **************************************************
     % Re-sample and estimate variances
@@ -48,8 +52,10 @@ function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field
 
         if rem(ct,10) == 0,  disp(num2str(ct)); end
         
-        field_11 = CDC_subset(field_1,dim,boot_sample(:,ct));
-        field_22 = CDC_subset(field_2,dim,boot_sample(:,ct));
+        order = repmat(boot_sample(:,ct)',N_block,1);
+        order = order(:);
+        field_11 = CDC_subset(field_1,dim,order);
+        field_22 = CDC_subset(field_2,dim,order);
 
         temp = CDC_var(field_11,dim,field_22);
         out_member = CDC_assign(out_member,temp,dim_2,ct);
@@ -58,10 +64,8 @@ function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field
     % **************************************************
     % Correct for underestimation
     % ************************************************** 
-    med = quantile(out_member,0.5,dim_2);
-    rep = size(out_member);
-    rep(1:dim_2-1) = 1;
-    out_member = out_member + repmat(output - med,rep);
+    out_member = out_member * size(field_1,N) / (size(field_1,N)-1);
+    size(field_1,N)
  
     % **************************************************
     % Correct for underestimation

@@ -7,7 +7,7 @@
 %  
 % Last update: 2018-08-10
 
-function file_name = CDC_ls(dir_disp,file_type)
+function file_name = CDC_ls(dir_disp,file_type,key_word)
     
     dir = pwd;
     
@@ -17,9 +17,19 @@ function file_name = CDC_ls(dir_disp,file_type)
     
     cd(dir_disp);
 
-    command = 'ls -1';
+    if ~exist('key_word','var'),
+        command = 'ls -1';
+    else
+        command = ['ls -1 *', key_word,'*'];
+    end
+    
     if exist('file_type','var'),
-        command = [command,' *.',file_type];
+        if ~exist('key_word','var'),
+            command = [command,' *.',file_type];
+        else
+            command = [command,'.',file_type];
+        end
+        
     end
     
     [~,a] = system(command);

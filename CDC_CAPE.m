@@ -24,10 +24,11 @@ function [CAPE,CIN,Tp,Te] = CDC_CAPE(p0, T0, q0, p, Te , Qe)
         QP = QP_save(:,:,spd_id,hgt_id,dmn_id);
         T  = TABS_save(:,:,spd_id,hgt_id,dmn_id);
         QV = QV_save(:,:,spd_id,hgt_id,dmn_id);
-        T0 = T(1,1000);
+        T0 = T(1,:);
         p0 = p(1);
-        q0 = QV(1,1000);
+        q0 = QV(1,:);
         Te = T;
+        Qe = QV;
         clear('T','QV','TABS_save','QP_save','QV_save')
     end
     

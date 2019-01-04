@@ -1,4 +1,4 @@
-% [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim)
+% [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim,N_block)
 % 
 % output variables are:
 % - output:     mean
@@ -9,9 +9,9 @@
 % and perform bootstrap to estimate the uncertainty of mean.
 % 
 % 
-% Last update: 2018-08-23
+% Last update: 2018-11-24
 
-function [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim)
+function [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim,N_block)
 
     % **************************************************
     % Parsing the data
@@ -21,6 +21,8 @@ function [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim)
     elseif nargin < 3 && size(field_1,1) == 1,
         dim = 2;    
     end
+    
+    if ~exist('N_block','var'), N_block = 1; end
 
     % **************************************************
     % Compute sample mean
@@ -31,7 +33,7 @@ function [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim)
     % Bootstrap for the order 
     % **************************************************
     rng(0);
-    [~,boot_sample] = bootstrp(N, @(x) [mean(x)], [1:size(field_1,dim)]);
+    [~,boot_sample] = bootstrp(N, @(x) [mean(x)], [1:size(field_1,dim)/N_block]);
     
     % **************************************************
     % Re-sample and estimate mean
@@ -41,20 +43,22 @@ function [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim)
     for ct = 1:N
         
         if rem(ct,10) == 0,  disp(num2str(ct)); end
-        
-        field_11 = CDC_subset(field_1,dim,boot_sample(:,ct));
+                
+        order = repmat(boot_sample(:,ct)',N_block,1);
+        order = order(:);
+        field_11 = CDC_subset(field_1,dim,order);
 
         temp = nanmean(field_11,dim);
         out_member = CDC_assign(out_member,temp,dim_2,ct);
     end
  
     % **************************************************
-    % Correct for underestimation
+    % Correct for underestimation: not for mean
     % ************************************************** 
-    med = quantile(out_member,0.5,dim_2);
-    rep = size(out_member);
-    rep(1:dim_2-1) = 1;
-    out_member = out_member + repmat(output - med,rep);
+    % med = quantile(out_member,0.5,dim_2);
+    % rep = size(out_member);
+    % rep(1:dim_2-1) = 1;
+    % out_member = out_member + repmat(output - med,rep);
  
     % **************************************************
     % Correct for underestimation
