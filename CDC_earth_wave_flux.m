@@ -19,11 +19,12 @@ function [flux_final_x, flux_final_y] = CDC_earth_wave_flux(z_amn,z_clim,lon,lat
     % *********************************************************************
     % Set parameters and parse inputs
     % *********************************************************************
-    scale = 1;
-    scale_x = 1;
-    scale_y = 1;
+    scale      = 1;
+    scale_x    = 1;
+    scale_y    = 1;
     do_regress = 0;
     pressure   = pressure/1000;
+    key        = 15; % mask results within this latitude
 
     if min(size(lon)) == 1,
         [lat,lon] = meshgrid(lat,lon);
@@ -51,33 +52,38 @@ function [flux_final_x, flux_final_y] = CDC_earth_wave_flux(z_amn,z_clim,lon,lat
     % compute wave activity fluxes
     % *********************************************************************
     dim   = 1;
-    du_dx = CDC_earth_div(u_g,dim,lon,lat,scale,do_regress);
+    du_dx = CDC_earth_grad_sphere(u_g,dim,lon,lat,scale,do_regress);  % XXX/m
 
     dim   = 1;
-    dv_dx = CDC_earth_crul(v_g,dim,lon,lat,scale,do_regress);
+    dv_dx = CDC_earth_grad_sphere(v_g,dim,lon,lat,scale,do_regress);
 
     dim   = 2;
-    du_dy = CDC_earth_crul(u_g,dim,lon,lat,scale,do_regress);
+    du_dy = CDC_earth_grad_sphere(u_g,dim,lon,lat,scale,do_regress);
 
     % ---------------------------------------------------------------------
     % Compute individual terms
     % ---------------------------------------------------------------------
     term_x_U = v_g.^2 - psi .* dv_dx;
-    term_x_V = psi .* du_dx - u_g.^2;
+    term_x_V = psi .* du_dx - u_g .* v_g ;
     term_y_U = term_x_V;
     term_y_V = u_g.^2 + psi .* du_dy;
 
     % ---------------------------------------------------------------------
     % Merge with the mean-flow
     % ---------------------------------------------------------------------
-    flux_x   = u_b .* term_x_U + v_b .* term_x_V;
-    flux_y   = u_b .* term_y_U + v_b .* term_y_V;
+    flux_x   = repmat(u_b,rep_list) .* term_x_U + repmat(v_b,rep_list) .* term_x_V;
+    flux_y   = repmat(u_b,rep_list) .* term_y_U + repmat(v_b,rep_list) .* term_y_V;
 
     % ---------------------------------------------------------------------
     % Scale with pressure level and mean-flow speed
     % ---------------------------------------------------------------------
     wspeed   = sqrt(u_b.^2 + v_b.^2);
-    flux_final_x = flux_x .* pressure .* cos(lat / 180 * pi) ./2  ./ wspeed;
-    flux_final_y = flux_y .* pressure .* cos(lat / 180 * pi) ./2  ./ wspeed;
+    flux_final_x = flux_x .* pressure .* cos(repmat(lat,rep_list)/180*pi) ./2  ./ repmat(wspeed,rep_list);
+    flux_final_y = flux_y .* pressure .* cos(repmat(lat,rep_list)/180*pi) ./2  ./ repmat(wspeed,rep_list);
 
+    flux_final_x(abs(repmat(lat,rep_list)) < key) = nan;
+    flux_final_y(abs(repmat(lat,rep_list)) < key) = nan;
+
+    flux_final_x(abs(repmat(u_b,rep_list)) < 1.0) = nan;
+    flux_final_y(abs(repmat(u_b,rep_list)) < 1.0) = nan;
 end

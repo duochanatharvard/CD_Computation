@@ -49,6 +49,7 @@ function output = CDC_earth_grad(input,dim,lon,lat,scale,do_regress)
             l_2 = [1+scale:N 1:scale];
             diff_input = CDC_subset(input,dim,l_2) - CDC_subset(input,dim,l_1);
             diff_dist  = CDC_subset(lon,dim,l_2) - CDC_subset(lon,dim,l_1);
+            diff_dist  = rem(diff_dist+180*5,360)-180;
             diff_dist  = repmat(diff_dist .* cos(lat/180*pi),rep_list);
 
         elseif dim == 2,
@@ -60,7 +61,7 @@ function output = CDC_earth_grad(input,dim,lon,lat,scale,do_regress)
             diff_dist  = repmat(diff_dist,rep_list);
         end
         
-        output = diff_input ./ (diff_dist * 1.11);
+        output = diff_input ./ (diff_dist * 1.117);
         
     else % Use regression to find the gradient
         
@@ -114,9 +115,9 @@ function output = CDC_earth_grad(input,dim,lon,lat,scale,do_regress)
         output = CDC_trend(input_temp,postn_temp,N_dim+1);
         output = output{1};
         if dim == 1,
-            output = output ./ 1.11 ./ repmat(cos(lat/180*pi),rep_list);
+            output = output ./ 1.117 ./ repmat(cos(lat/180*pi),rep_list);
         else
-            output = output ./ 1.11;
+            output = output ./ 1.117;
         end
     end    
 end

@@ -45,8 +45,8 @@ function [u,v] = CDC_earth_gw(input,lon,lat,varname,mass,scale_x,scale_y,do_regr
             u = - dy ./ f ./ rho;
             v =   dx ./ f ./ rho;
         case 'hgt'
-            u = - dy ./ f * 9.8;
-            v =   dx ./ f * 9.8;
+            u = - dy ./ f * 9.807;
+            v =   dx ./ f * 9.807;
     end
     
 end
