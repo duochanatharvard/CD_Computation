@@ -54,6 +54,8 @@ function output = CDC_get_reso(model_name)
            output = [ 1.1215	1.125];
         case 'FGOALS-g2',
            output = [ 2.7906	2.8125];
+        case 'FIO-ESM',
+           output = [ 2.8	2.8];
         case 'FGOALS-gl',
            output = [ 4.1026	5];
         case 'FGOALS-s2',

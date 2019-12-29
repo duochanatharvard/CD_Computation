@@ -6,7 +6,7 @@
 %  
 % Last update: 2018-08-09
 
-function [output,output_sig,fitted] = CDC_trend(field_y,field_x,dim)
+function [output,output_sig,fitted] = CDC_trend(field_y,field_x,dim,sig_alpha)
 
     dim_list = ones(1,numel(size(field_y)));
     dim_list(dim) = size(field_y,dim);
@@ -20,6 +20,8 @@ function [output,output_sig,fitted] = CDC_trend(field_y,field_x,dim)
             error('Incorrect dimensionality!')
         end
     end
+    
+    if ~exist('sig_alpha','var'),  sig_alpha = 0.975; end
 
     % *****************************************************************
     % Remove NaN
@@ -61,7 +63,7 @@ function [output,output_sig,fitted] = CDC_trend(field_y,field_x,dim)
         output_std = sqrt(err ./ x_sqrt_2);
         intercept_std    = sqrt(err .* (1 ./ (l_effect + 1) + mu_sqrt_2 ./ x_sqrt_2));
 
-        n_std = tinv(0.975,l_effect-1);
+        n_std = tinv(sig_alpha,l_effect-1);
 
         % *****************************************************************
         % Compute significance level

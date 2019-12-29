@@ -54,7 +54,7 @@ function [CAPE,CIN,Tp,Te] = CDC_CAPE(p0, T0, q0, p, Te , Qe)
     p_ref = 1000;   % mb
     R  = 287;       % J / K / kg
     Cp = 1004;      % J / K / kg
-    L  = 2.5104e6;  % J / K / kg
+    L  = 2.5104e6;  % J / kg
 
     % ***********************************************
     % pre-define some functions

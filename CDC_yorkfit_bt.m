@@ -18,12 +18,13 @@
 % Last update: 2018-08-23
 
 function [slope, inter, slope_member, inter_member] =  ...
-            CDC_yorkfit_bt(field_y,field_x,sigma_y,sigma_x,r,dim,N)
+            CDC_yorkfit_bt(field_y,field_x,sigma_y,sigma_x,r,dim,N,varargin)
 
     % *****************************************************************
     % Parsing inputs
     % *****************************************************************
-    if nargin ~= 7,  error('Not enough inputs!!'); end
+    if nargin < 7,   error('Not enough inputs!!'); end
+    if nargin == 8,  P = varargin{1};              end
     if isempty(r), r = 0; end
     
     dim_1 = size(field_y)*0 + 1;   dim_1(dim) = size(field_y,dim); 
@@ -70,7 +71,18 @@ function [slope, inter, slope_member, inter_member] =  ...
     dim_2 = numel(size(slope_member));
     for ct = 1:N
 
-        if rem(ct,10) == 0,  disp(num2str(ct)); end
+        if exist('P','var'),
+            if isfield(P,'mute_output'),
+                if P.mute_output == 1,
+                else
+                    if rem(ct,round(N/10)) == 0,  disp(num2str(ct)); end
+                end
+            else
+                if rem(ct,round(N/10)) == 0,  disp(num2str(ct)); end
+            end
+        else
+            if rem(ct,round(N/10)) == 0,  disp(num2str(ct)); end
+        end
         
         field_yy = CDC_subset(field_y,dim,boot_sample(:,ct));
         field_xx = CDC_subset(field_x,dim,boot_sample(:,ct));
