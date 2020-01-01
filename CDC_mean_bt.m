@@ -44,7 +44,8 @@ function [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim,N_block)
         
         if rem(ct,10) == 0,  disp(num2str(ct)); end
                 
-        order = repmat(boot_sample(:,ct)',N_block,1);
+        order = repmat(boot_sample(:,ct)'*N_block-N_block,N_block,1);
+        order = order + repmat([1:N_block]',1,size(boot_sample,1));
         order = order(:);
         field_11 = CDC_subset(field_1,dim,order);
 

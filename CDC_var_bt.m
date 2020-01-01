@@ -52,7 +52,8 @@ function [output,l_effect, out_member, out_std] = CDC_var_bt(field_1,N,dim,field
 
         if rem(ct,100) == 0,  disp(num2str(ct)); end
 
-        order = repmat(boot_sample(:,ct)',N_block,1);
+        order = repmat(boot_sample(:,ct)'*N_block-N_block,N_block,1);
+        order = order + repmat([1:N_block]',1,size(boot_sample,1));
         order = order(:);
         field_11 = CDC_subset(field_1,dim,order);
         field_22 = CDC_subset(field_2,dim,order);
