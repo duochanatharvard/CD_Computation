@@ -27,6 +27,8 @@ function CDC
     disp('    CDC_corr               % Compute correlation')
     disp('    CDC_trend              % Compute linear trend or dependency')
     disp('    CDC_mask_mean          % Compute Mask or regional average')
+    disp('    CDC_hist2d             % 2D Histogram')
+    disp('    CDC_bin1d              % 1D Histogram')
     disp(' ')
     disp(' ')
     disp('Fitting:')

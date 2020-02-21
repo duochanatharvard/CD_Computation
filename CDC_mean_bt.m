@@ -42,7 +42,7 @@ function [output, out_member, out_std] = CDC_mean_bt(field_1,N,dim,N_block)
     dim_2 = numel(size(out_member));
     for ct = 1:N
         
-        if rem(ct,10) == 0,  disp(num2str(ct)); end
+        if rem(ct,100) == 0,  disp(num2str(ct)); end
                 
         order = repmat(boot_sample(:,ct)'*N_block-N_block,N_block,1);
         order = order + repmat([1:N_block]',1,size(boot_sample,1));

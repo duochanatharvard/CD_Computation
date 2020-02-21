@@ -1,10 +1,10 @@
-% [output,l_effect, R2, R2_quantile] = CDC_corr(field_1,field_2,dim)
+% [output,l_effect, R2, R2_quantile, pic_mem] = CDC_corr(field_1,field_2,dim)
 % 
 % CDC_corr computes the correlation in certain dimension
 % 
 % Last update: 2018-08-09
 
-function [output,l_effect, R2, R2_quantile] = CDC_corr(field_1,field_2,dim)
+function [output,l_effect, R2, R2_quantile, pic_mem] = CDC_corr(field_1,field_2,dim)
 
     if  nargin == 2 && size(field_1,1) ~= 1,
         dim = 1;
@@ -26,11 +26,16 @@ function [output,l_effect, R2, R2_quantile] = CDC_corr(field_1,field_2,dim)
     cov_12 = CDC_nansum(field_anm_1 .* field_anm_2,dim) ./ l_effect;
     
     output = cov_12 ./ sqrt(var_1) ./ sqrt(var_2);
+    
+    l = l_effect < 3;
+    output(l)   = nan;
+    l_effect(l) = nan;
 
     % statistical test
     % reference: http://onlinestatbook.com/2/sampling_distributions/samp_dist_r.html
     rng(0);
     N = 100;
+    output(output>1) = 0.99999999;
     z       = 0.5*log((1+output)./(1-output));
     z_std   = 1./sqrt(l_effect - 2);
     out_member = nan([size(output) N]);
