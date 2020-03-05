@@ -33,19 +33,21 @@ function [output,l_effect, R2, R2_quantile, pic_mem] = CDC_corr(field_1,field_2,
 
     % statistical test
     % reference: http://onlinestatbook.com/2/sampling_distributions/samp_dist_r.html
-    rng(0);
-    N = 100;
-    output(output>1) = 0.99999999;
-    z       = 0.5*log((1+output)./(1-output));
-    z_std   = 1./sqrt(l_effect - 2);
-    out_member = nan([size(output) N]);
-    dim_2 = numel(size(out_member));
-    for ct = 1:100
-        temp       = normrnd(z,z_std);
-        out_member = CDC_assign(out_member,temp,dim_2,ct);
+    if nargout > 2
+        rng(0);
+        N = 100;
+        output(output>1) = 0.99999999;
+        z       = 0.5*log((1+output)./(1-output));
+        z_std   = 1./sqrt(l_effect - 2);
+        out_member = nan([size(output) N]);
+        dim_2 = numel(size(out_member));
+        for ct = 1:100
+            temp       = normrnd(z,z_std);
+            out_member = CDC_assign(out_member,temp,dim_2,ct);
+        end
+        pic_mem = (exp(2*out_member) - 1)./ (exp(2*out_member) + 1);
+        R2_quantile = squeeze(quantile(pic_mem.^2,[0.025 0.25 0.75 0.975],dim_2));
+        R2     = output.^2;
     end
-    pic_mem = (exp(2*out_member) - 1)./ (exp(2*out_member) + 1);
-    R2_quantile = squeeze(quantile(pic_mem.^2,[0.025 0.25 0.75 0.975],dim_2));
-    R2     = output.^2;
 
 end
