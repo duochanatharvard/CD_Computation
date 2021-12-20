@@ -40,7 +40,7 @@ function sample = CDC_mcmc_sampler(x,y,z,P,N)
 
         % Move to the next position ---------------------------------------
         a = randperm(5);
-        b = sign(normrnd(0,1,1)) .* a(1);
+        b = sign(normrnd(0,2,1)) .* a(1);
         p_new = p_old;
         p_new(i) = p_old(i) + b;
         if p_new(i) > Dim(i), p_new(i) = Dim(i); end
