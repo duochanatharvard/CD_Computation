@@ -64,6 +64,7 @@ function CDC
     disp('    CDC_EOF                % EOF analysis')
     disp('    CDC_earth_wave_flux    % Compute stationary wave activity flux')
     disp('    CDC_interp2            % 2D Interpolation')
+    disp('    CDC_interp1            % Account for nan values')
     disp('    CDC_calculate_AMO      % Calculate AMO index using an SST input')
     disp('    CDC_generate_mask      % Generate regional mask on a grid')
     disp('    CDC_mon2sea            % Average monthly into seasonal values')
