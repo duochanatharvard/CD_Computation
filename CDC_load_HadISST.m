@@ -3,7 +3,11 @@
 function [HadISST,lon,lat,yr] = CDC_load_HadISST
 
     % HadISST
-    dir = '/Users/duochan/Data/Other_SSTs/HadISST/';
+    if strcmp(computer,'MACI64')
+        dir = '/Users/duochan/Data/Other_SSTs/HadISST/';
+    else
+        dir = '/n/home10/dchan/Other_SSTs/HadISST/';
+    end
     file = [dir,'HadISST_sst.nc'];
 
     HadISST = ncread(file,'sst');

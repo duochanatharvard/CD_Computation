@@ -3,7 +3,12 @@
 function [ERSST5,lon,lat,yr] = CDC_load_ERSST5
 
     % ERSST5
-    dir = '/Users/duochan/Data/Other_SSTs/ERSST5/';
+    if strcmp(computer,'MACI64')
+        dir = '/Users/duochan/Data/Other_SSTs/ERSST5/';
+    else
+        dir = '/n/home10/dchan/Other_SSTs/ERSST5/';
+    end
+
     file = [dir,'sst.mnmean.nc'];
 
     ERSST5 = ncread(file,'sst');

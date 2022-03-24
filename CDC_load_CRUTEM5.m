@@ -3,7 +3,11 @@
 function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5
 
     % CRUTEM5
-    dir = '/Users/duochan/Data/Other_SSTs/HadCRUT5/';
+    if strcmp(computer,'MACI64')
+        dir = '/Users/duochan/Data/Other_SSTs/HadCRUT5/';
+    else
+        dir = '/n/home10/dchan/Other_SSTs/HadCRUT5/';
+    end
     
     if ~exist('en','var')
         file = [dir,'CRUTEM.5.0.1.0.anomalies.nc'];

@@ -3,7 +3,11 @@
 function [HadISST2,lon,lat,yr] = CDC_load_HadISST2(en)
 
     % HadISST2
-    dir = '/Users/duochan/Data/Other_SSTs/HadISST2/';
+    if strcmp(computer,'MACI64')
+        dir = '/Users/duochan/Data/Other_SSTs/HadISST2/';
+    else
+        dir = '/n/home10/dchan/Other_SSTs/HadISST2/';
+    end
     
     if ~exist('en','var')
         file = [dir,'ERA20C_SST.nc'];

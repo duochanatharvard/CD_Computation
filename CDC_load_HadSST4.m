@@ -3,7 +3,11 @@
 function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en)
 
     % HadSST4
-    dir = '/Users/duochan/Data/Other_SSTs/HadSST4/';
+    if strcmp(computer,'MACI64')
+        dir = '/Users/duochan/Data/Other_SSTs/HadSST4/';
+    else
+        dir = '/n/home10/dchan/Other_SSTs/HadSST4/';
+    end
     
     if ~exist('en','var')
         file = [dir,'HadSST.4.0.1.0_median.nc'];

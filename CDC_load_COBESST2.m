@@ -3,7 +3,11 @@
 function [COBESST2,lon,lat,yr] = CDC_load_COBESST2
 
     % COBESST2
-    dir = '/Users/duochan/Data/Other_SSTs/CobeSST2/';
+    if strcmp(computer,'MACI64')
+        dir = '/Users/duochan/Data/Other_SSTs/CobeSST2/';
+    else
+        dir = '/n/home10/dchan/Other_SSTs/CobeSST2/';
+    end
     file = [dir,'sst.mon.mean.nc'];
 
     COBESST2 = ncread(file,'sst');
