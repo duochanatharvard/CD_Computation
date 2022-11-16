@@ -1,4 +1,8 @@
 % order = CDC_get_boot_order(N_total,N_block,N_sample,en)
+% N_total:   Total number of points
+% N_block:   Number of points in a block
+% N_sample:  Total number of bootsrapping members
+% en:        Which ensemble member
 function order = CDC_get_boot_order(N_total,N_block,N_sample,en)
 
     rng(0);

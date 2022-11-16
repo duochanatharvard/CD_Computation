@@ -1,36 +1,93 @@
-% [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en)
+% [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en,P)
+% P.do_random :: use ensemble members additionally perturbed for random errors
 
-function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en)
+function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en,P)
 
-    % HadSST4
-    if strcmp(computer,'MACI64')
-        dir = '/Users/duochan/Data/Other_SSTs/HadSST4/';
-    else
-        dir = '/n/home10/dchan/Other_SSTs/HadSST4/';
-    end
-    
-    if ~exist('en','var')
-        file = [dir,'HadSST.4.0.1.0_median.nc'];
-    else
-        if en == 0
-            file = [dir,'HadSST.4.0.1.0_median.nc'];
-        elseif en == -1
-            file = [dir,'HadSST.4.0.1.0_unadjusted.nc'];
+    if ~exist('en','var'), en = 0;  end
+    if ~exist('P','var')
+        if en <= 0
+            P.do_random = 0;
         else
-            file = [dir,'HadSST-2/HadSST.4.0.1.0_ensemble_member_',num2str(en),'.nc'];
+            P.do_random = 1;
         end
     end
+    dir    = [CDC_other_temp_dir,'HadSST4/'];
 
-    HadSST4 = ncread(file,'tos');
-    lon    = ncread(file,'longitude');
-    lat    = ncread(file,'latitude');
-    
-    HadSST4(HadSST4>1000) = nan;
-    HadSST4 = HadSST4([37:72 1:36],:,:);
-    lon    = lon([37:72 1:36]);  lon(lon<0) = lon(lon<0) + 360;
+    if en == 0
+        file = [dir,'HadSST.4.0.1.0_median.nc'];
+    elseif en == -1
+        file = [dir,'HadSST.4.0.1.0_unadjusted.nc'];
+    else
+        file = [dir,'HadSST_ensemble_v1/HadSST.4.0.1.0_ensemble_member_',num2str(en),'.nc'];
+    end
 
-    Nt     = fix(size(HadSST4,3)/12)*12;
-    HadSST4 = reshape(HadSST4(:,:,1:Nt),size(HadSST4,1),size(HadSST4,2),12,Nt/12);
-    yr     = [1:Nt/12]+1849;
+    if en <= 0 || P.do_random == 0
+        
+        HadSST4 = ncread(file,'tos');
+        lon    = ncread(file,'longitude');
+        lat    = ncread(file,'latitude');
+
+        HadSST4(HadSST4>1000) = nan;
+        HadSST4 = HadSST4([37:72 1:36],:,:);
+        lon    = lon([37:72 1:36]);  lon(lon<0) = lon(lon<0) + 360;
+
+        Nt      = fix(size(HadSST4,3)/12)*12;
+        HadSST4 = reshape(HadSST4(:,:,1:Nt),size(HadSST4,1),size(HadSST4,2),12,Nt/12);
+        yr      = [1:Nt/12]+1849;
     
+    else % when P.do_random == 1 && en > 0
+        
+        % err1 = ncread([dir,'HadSST.4.0.1.0_correlated_measurement_uncertainty.nc'],'tos_unc');
+        file_HadSST4 = [dir,'HadSST_ensemble_v1_perturbed/HadSST.4.0.1.0_perturbed_ensemble_member_',num2str(en),'.mat'];
+        
+        if ~isfile(file_HadSST4)
+        
+            err1 = ncread([dir,'HadSST.4.0.1.0_sampling_uncertainty.nc'],'tos_unc');
+            err2 = ncread([dir,'HadSST.4.0.1.0_uncorrelated_measurement_uncertainty.nc'],'tos_unc');
+
+            errt = sqrt(err1.^2 + err2.^2);
+            errt = reshape(errt(:,:,1:Nt),72,36,12,Nt/12);
+            sample1 = normrnd(0,errt);
+
+            sample2 = nan(size(sample1));
+            for ct_yr = [1:Nt/12] + 1849
+                dir_err  = [dir,'HadSST_error_covariance/HadSST.4.0.1.0_error_covariance_',num2str(ct_yr),'/'];
+                for ct_mon = 1:12
+                    disp([ct_yr ct_mon])
+                    file_err = [dir_err,'HadSST.4.0.1.0_error_covariance_',num2str(ct_yr),CDF_num2str(ct_mon,2),'.nc'];
+                    tos_cov  = ncread(file_err,'tos_cov');
+                    l        = nanmean(tos_cov,1) ~= 0;
+                    tos_cov_temp = tos_cov(l,l);
+                    temp2    = mvnrnd(zeros(size(tos_cov_temp,1),1),tos_cov_temp);
+                    temp     = nan(size(tos_cov,1),1);
+                    temp(l)  = temp2;
+                    sample2(:,:,ct_mon,ct_yr-1849)   = reshape(temp,72,36);
+                end
+            end
+
+            sample = sample1 + sample2;
+            sample = sample([37:72 1:36],:,:,:);
+
+            HadSST4  = HadSST4 + sample;
+            save(file_HadSST4,'HadSST4','-v7.3')
+
+        else
+            load(file_HadSST4,'HadSST4');
+        end
+        yr = [1:size(HadSST4,4)]+1849;
+    end
+
+    [yr_start,yr_end] = CDC_common_time_interval;
+    [HadSST4, yr] = CDC_trim_years(HadSST4, yr, yr_start, yr_end);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% out = CDF_num2str(num,len)
+% len: total length of output that would be filled with zeros...
+function out = CDF_num2str(num,len)
+
+    out = repmat('0',1,len);
+    a = num2str(num);
+    out(end-size(a,2)+1:end) = a;
 end

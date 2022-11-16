@@ -15,4 +15,6 @@ function [HadISST1b,lon,lat,yr] = CDC_load_HadISST1b(en)
     HadISST1b = reshape(HadISST1b(:,:,1:Nt),size(HadISST1b,1),size(HadISST1b,2),12,Nt/12);
     yr      = [1:Nt/12]+1870;
     
+    [yr_start,yr_end] = CDC_common_time_interval;
+    [HadISST1b, yr] = CDC_trim_years(HadISST1b, yr, yr_start, yr_end);
 end

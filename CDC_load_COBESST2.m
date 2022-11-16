@@ -1,23 +1,42 @@
-% [COBESST2,lon,lat,yr] = CDC_load_COBESST2
+% [COBESST2,lon,lat,yr] = CDC_load_COBESST2(en)
+% if en exist :: use regridded data
 
-function [COBESST2,lon,lat,yr] = CDC_load_COBESST2
+function [COBESST2,lon,lat,yr] = CDC_load_COBESST2(en)
 
-    % COBESST2
-    if strcmp(computer,'MACI64')
-        dir = '/Users/duochan/Data/Other_SSTs/CobeSST2/';
-    else
-        dir = '/n/home10/dchan/Other_SSTs/CobeSST2/';
-    end
-    file = [dir,'sst.mon.mean.nc'];
-
-    COBESST2 = ncread(file,'sst');
-    lon    = ncread(file,'lon');
-    lat    = ncread(file,'lat');
-    COBESST2(COBESST2>1000) = nan;
-    COBESST2 = COBESST2(:,end:-1:1,:);
-    lat    = lat(end:-1:1);
-    Nt     = fix(size(COBESST2,3)/12)*12;
-    COBESST2 = reshape(COBESST2(:,:,1:Nt),size(COBESST2,1),size(COBESST2,2),12,Nt/12);
-    yr     = [1:Nt/12]+1849;
+    dir    = [CDC_other_temp_dir,'CobeSST2/'];
     
+    if ~exist('en','var')
+        
+        file   = [dir,'sst.mon.mean.nc'];
+        COBESST2 = ncread(file,'sst');
+        lon    = ncread(file,'lon');
+        lat    = ncread(file,'lat');
+        COBESST2(COBESST2>1000) = nan;
+        
+        COBESST2 = COBESST2(:,end:-1:1,:);
+        lat    = lat(end:-1:1);
+        Nt     = fix(size(COBESST2,3)/12)*12;
+        COBESST2 = reshape(COBESST2(:,:,1:Nt),size(COBESST2,1),size(COBESST2,2),12,Nt/12);
+        yr     = [1:Nt/12]+1849;
+        
+    else
+        lon = 2.5:5:360;
+        lat = -87.5:5:360;
+        
+        file = [dir,'COBESST_5x5_regridded.mat'];
+        
+        if ~isfile(file)
+            
+            [sst,lon_high,lat_high,yr] = CDC_load_COBESST2;
+            sst = CDC_average_grid(lon_high',lat_high',sst(:,:,:),lon_target,lat_target);
+            sst = reshape(sst,size(sst,1),size(sst,2),12,size(sst,3)/12);
+            save(file,'sst','yr','-v7.3');
+        else
+            load(file);
+        end
+        COBESST2 = sst - nanmean(sst(:,:,:,[1982:2014]-1849),4);
+    end
+
+    [yr_start,yr_end] = CDC_common_time_interval;
+    [COBESST2, yr] = CDC_trim_years(COBESST2, yr, yr_start, yr_end);
 end

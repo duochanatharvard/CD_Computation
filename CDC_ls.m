@@ -1,43 +1,43 @@
-% file_name = CDC_ls(dir_load,file_type)
+% file_name = CDC_ls(dir_load,file_type,key_word)
 %
-% CDC_ls returns all the files in a given directory, return values can be
-%        directly used to loop over files
-%  - dir_disp: direcotry to display, default is current directory
-%  - file_type: optional
-%  
-% Last update: 2018-08-10
+% Example for getting a processed output:
+%    dir_file  = CMIP6_IO(var_name,exp_name,'processed','mon');
+%    file_list = CDC_ls(dir_file,'nc',{['_',model,'_'],['_',en,'_'],['_reso_',num2str(reso)]});
 
-function file_name = CDC_ls(dir_disp,file_type,key_word)
+function file_name = CDC_ls(dir_load,file_type,keyword)
     
     dir = pwd;
-    
-    if nargin < 1,
-        dir_disp = dir;
-    end
-    
-    cd(dir_disp);
+    cd(dir_load);
+    if ~strcmp(dir_load(end),'/')    dir_load(end+1) = '/';   end
 
-    if ~exist('key_word','var'),
-        command = 'ls -1';
-    else
-        command = ['ls -1 *', key_word,'*'];
-    end
+    command = 'ls -1 ';
     
-    if exist('file_type','var'),
-        if ~exist('key_word','var'),
-            command = [command,' *.',file_type];
+    if exist('file_type','var') && ~exist('keyword','var')
+        command = [command,'*.',file_type];
+    elseif exist('keyword','var') && isempty(file_type)
+        if ~iscell(keyword)
+            command = [command,'*',keyword,'*'];
         else
-            command = [command,'.',file_type];
+            for ct = 1:numel(keyword)
+               command = [command,'*',keyword{ct}];
+            end
+        end 
+    elseif exist('keyword','var') && ~isempty(file_type)
+        if ~iscell(keyword)
+            command = [command,'*',keyword,'*.',file_type];
+        else
+            for ct = 1:numel(keyword)
+               command = [command,'*',keyword{ct}];
+            end
+            command = [command,'*.',file_type]; 
         end
-        
     end
     
     [~,a] = system(command);
     file_list = [0 find(a == 10)];
     for i = 1:numel(file_list)-1
-        file_name{i} = a(file_list(i)+1:file_list(i+1)-1);
+        file_name{i} = [dir_load,a(file_list(i)+1:file_list(i+1)-1)];
     end
     
     cd(dir)
 end
-    

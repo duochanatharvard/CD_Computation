@@ -2,23 +2,15 @@
 
 function [HadSST3,lon,lat,yr] = CDC_load_HadSST3(en)
 
-    % HadSST3
-    if strcmp(computer,'MACI64')
-        dir = '/Users/duochan/Data/Other_SSTs/HadSST3/';
-    else
-        dir = '/n/home10/dchan/Other_SSTs/HadSST3/';
-    end
+    if ~exist('en','var'), en = 0;  end
+    dir    = [CDC_other_temp_dir,'HadSST3/'];
     
-    if ~exist('en','var')
+    if en == 0
         file = [dir,'HadSST.3.1.1.0.median.nc'];
+    elseif en == -1
+        file = [dir,'HadSST.3.1.1.0.unadjusted.nc'];
     else
-        if en == 0
-            file = [dir,'HadSST.3.1.1.0.median.nc'];
-        elseif en == -1
-            file = [dir,'HadSST.3.1.1.0.unadjusted.nc'];
-        else
-            file = [dir,'HadSST/HadSST.3.1.1.0.anomalies.',num2str(en),'.nc'];
-        end
+        file = [dir,'HadSST/HadSST.3.1.1.0.anomalies.',num2str(en),'.nc'];
     end
 
     HadSST3 = ncread(file,'sst');
@@ -37,5 +29,8 @@ function [HadSST3,lon,lat,yr] = CDC_load_HadSST3(en)
     if en == -1
         HadSST3 = HadSST3(:,[end:-1:1],:,:);
     end
+
+    [yr_start,yr_end] = CDC_common_time_interval;
+    [HadSST3, yr] = CDC_trim_years(HadSST3, yr, yr_start, yr_end);
     
 end

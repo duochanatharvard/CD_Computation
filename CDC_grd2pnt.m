@@ -1,7 +1,10 @@
-% out_pnts = CDC_grd2pnt(in_lon,in_lat,in_dy,reso_x,reso_y,reso_t)
+% out_pnts = CDC_grd2pnt(in_lon,in_lat,in_dy,in_grd,reso_x,reso_y,reso_t)
 
 function out_pnts = CDC_grd2pnt(in_lon,in_lat,in_dy,in_grd,reso_x,reso_y,reso_t)
 
+    if size(in_lon,1) == 1, in_lon = in_lon'; end
+    if size(in_lat,1) == 1, in_lat = in_lat'; end
+    
     in_lon = rem(in_lon + 360*5, 360);
     x = fix(in_lon/reso_x)+1;
     num_x = 360/reso_x;
@@ -16,6 +19,7 @@ function out_pnts = CDC_grd2pnt(in_lon,in_lat,in_dy,in_grd,reso_x,reso_y,reso_t)
     if(isempty(in_dy))
         index = sub2ind(size(in_grd),x,y);
     else
+        if size(in_dy,1) == 1, in_dy = in_dy'; end
         z = min(fix((in_dy-0.01)./reso_t)+1,size(in_grd,3));
         index = sub2ind(size(in_grd),x,y,z);
     end

@@ -3,11 +3,7 @@
 function [HadISST,lon,lat,yr] = CDC_load_HadISST
 
     % HadISST
-    if strcmp(computer,'MACI64')
-        dir = '/Users/duochan/Data/Other_SSTs/HadISST/';
-    else
-        dir = '/n/home10/dchan/Other_SSTs/HadISST/';
-    end
+    dir    = [CDC_other_temp_dir,'HadISST/'];
     file = [dir,'HadISST_sst.nc'];
 
     HadISST = ncread(file,'sst');
@@ -22,4 +18,6 @@ function [HadISST,lon,lat,yr] = CDC_load_HadISST
     HadISST = reshape(HadISST(:,:,1:Nt),size(HadISST,1),size(HadISST,2),12,Nt/12);
     yr     = [1:Nt/12]+1869;
     
+    [yr_start,yr_end] = CDC_common_time_interval;
+    [HadISST, yr] = CDC_trim_years(HadISST, yr, yr_start, yr_end);
 end

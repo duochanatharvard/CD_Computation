@@ -42,7 +42,7 @@ function [stat,N,x_out,stat_mean] = CDC_bin1d(x,y,xx,varargin)
                       flipud(stat_mean - tinv_sig.* stat_std)' ];            
         end
         % patch(pic_x(~isnan(pic_y1)),pic_y1(~isnan(pic_y1)),col,'linest','none','facealpha',0.1);
-        patch(pic_x(~isnan(pic_y2)),pic_y2(~isnan(pic_y2)),col,'linest','none','facealpha',0.2);
+        patch(pic_x(~isnan(pic_y2)),pic_y2(~isnan(pic_y2)),col,'linest','none','facealpha',0.1);
         plot(x_out,stat(:,3)','linewi',3,'color',col)
         if numel(x_out<10)
             plot(x_out,stat(:,3)','.','linewi',3,'color',col,'markersize',40)
