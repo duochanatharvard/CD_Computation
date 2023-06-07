@@ -15,20 +15,22 @@ function [COBESST2,lon,lat,yr] = CDC_load_COBESST2(en)
         
         COBESST2 = COBESST2(:,end:-1:1,:);
         lat    = lat(end:-1:1);
-        Nt     = fix(size(COBESST2,3)/12)*12;
+        if rem(size(COBESST2,3),12) == 0
+            Nt  = size(COBESST2,3);
+        else
+            Nt  = ceil(size(COBESST2,3)/12)*12;
+            COBESST2(:,:,(end+1):Nt) = nan;
+        end
         COBESST2 = reshape(COBESST2(:,:,1:Nt),size(COBESST2,1),size(COBESST2,2),12,Nt/12);
         yr     = [1:Nt/12]+1849;
         
     else
-        lon = 2.5:5:360;
-        lat = -87.5:5:360;
-        
+        lon  = 2.5:5:360;
+        lat  = -87.5:5:90;
         file = [dir,'COBESST_5x5_regridded.mat'];
-        
         if ~isfile(file)
-            
             [sst,lon_high,lat_high,yr] = CDC_load_COBESST2;
-            sst = CDC_average_grid(lon_high',lat_high',sst(:,:,:),lon_target,lat_target);
+            sst = CDC_average_grid(lon_high',lat_high',sst(:,:,:),lon,lat);
             sst = reshape(sst,size(sst,1),size(sst,2),12,size(sst,3)/12);
             save(file,'sst','yr','-v7.3');
         else

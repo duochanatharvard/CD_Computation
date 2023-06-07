@@ -14,7 +14,12 @@ function [Berkeley, lon, lat, yr] = CDC_load_Berkeley(en)
         Berkeley = tas([181:end 1:180],:,:);
         lon      = lon([181:end 1:180]);  lon(lon<0) = lon(lon<0) + 360;
         
-        Nt       = fix(size(Berkeley,3)/12)*12;
+        if rem(size(Berkeley,3),12) == 0
+            Nt  = size(Berkeley,3);
+        else
+            Nt  = ceil(size(Berkeley,3)/12)*12;
+            Berkeley(:,:,(end+1):Nt) = nan;
+        end
         Berkeley = reshape(Berkeley(:,:,1:Nt),size(Berkeley,1),size(Berkeley,2),12,Nt/12);
         yr       = [1:Nt/12]+1749;
         

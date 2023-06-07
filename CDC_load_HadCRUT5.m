@@ -18,7 +18,7 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
         disp('HadCRUT5 does not provide uncorrected estimates,')
         disp('Loading weights for LATs and SSTs instead');
     else
-        file = [dir,'HadCRUT5_ensemble_v1/HadCRUT.5.0.1.0.anomalies.',num2str(en),'.nc'];
+        file = [dir,'HadCRUT5_ensemble/HadCRUT.5.0.1.0.anomalies.',num2str(en),'.nc'];
     end
 
     if en > 0
@@ -28,17 +28,22 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
     elseif en == -1
         HadCRUT5 = ncread(file,'weights');
     end
-    lon     = ncread(file,'longitude');
-    lat     = ncread(file,'latitude');
+    lon      = ncread(file,'longitude');
+    lat      = ncread(file,'latitude');
     
     HadCRUT5(HadCRUT5>1000) = nan;
     HadCRUT5 = HadCRUT5([37:72 1:36],:,:);
-    lon     = lon([37:72 1:36]);  lon(lon<0) = lon(lon<0) + 360;
+    lon      = lon([37:72 1:36]);  lon(lon<0) = lon(lon<0) + 360;
 
-    Nt       = fix(size(HadCRUT5,3)/12)*12;
+    if rem(size(HadCRUT5,3),12) == 0
+        Nt   = size(HadCRUT5,3);
+    else
+        Nt   = ceil(size(HadCRUT5,3)/12)*12;
+        HadCRUT5(:,:,(end+1):Nt) = nan;
+    end
     HadCRUT5 = reshape(HadCRUT5(:,:,1:Nt),size(HadCRUT5,1),size(HadCRUT5,2),12,Nt/12);
     yr       = [1:Nt/12]+1849;
 
     [yr_start,yr_end] = CDC_common_time_interval;
-    [HadCRUT5, yr] = CDC_trim_years(HadCRUT5, yr, yr_start, yr_end);
+    [HadCRUT5, yr]    = CDC_trim_years(HadCRUT5, yr, yr_start, yr_end);
 end

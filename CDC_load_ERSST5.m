@@ -18,13 +18,18 @@ function [ERSST5,lon,lat,yr] = CDC_load_ERSST5(en)
         ERSST5(ERSST5<-100) = nan;
         ERSST5 = ERSST5(:,end:-1:1,:);
         lat    = lat(end:-1:1);
-        Nt     = fix(size(ERSST5,3)/12)*12;
+        if rem(size(ERSST5,3),12) == 0
+            Nt  = size(ERSST5,3);
+        else
+            Nt  = ceil(size(ERSST5,3)/12)*12;
+            ERSST5(:,:,(end+1):Nt) = nan;
+        end
         ERSST5 = reshape(ERSST5(:,:,1:Nt),size(ERSST5,1),size(ERSST5,2),12,Nt/12);
         yr     = [1:Nt/12]+1853;
         
     else
         lon = 2.5:5:360;
-        lat = -87.5:5:360;
+        lat = -87.5:5:90;
         
         if en == 0
             
@@ -33,7 +38,7 @@ function [ERSST5,lon,lat,yr] = CDC_load_ERSST5(en)
             if ~isfile(file)
                 
                 [sst,lon_high,lat_high,yr] = CDC_load_ERSST5;
-                sst = CDC_average_grid(lon_high',lat_high',sst(:,:,:),lon_target,lat_target);
+                sst = CDC_average_grid(lon_high',lat_high',sst(:,:,:),lon,lat);
                 sst = reshape(sst,size(sst,1),size(sst,2),12,size(sst,3)/12);
                 save(file,'sst','yr','-v7.3');
             else    

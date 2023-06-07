@@ -16,10 +16,16 @@ function [GISTEMP, lon, lat, yr] = CDC_load_GISTEMP(en)
         GISTEMP  = tas([91:end 1:90],:,:);
         lon      = lon([91:end 1:90]);    lon(lon<0) = lon(lon<0) + 360;
         
-        Nt       = fix(size(GISTEMP,3)/12)*12;
+        if rem(size(GISTEMP,3),12) == 0
+            Nt  = size(GISTEMP,3);
+        else
+            Nt  = ceil(size(GISTEMP,3)/12)*12;
+            GISTEMP(:,:,(end+1):Nt) = nan;
+        end
         GISTEMP  = reshape(GISTEMP(:,:,1:Nt),size(GISTEMP,1),size(GISTEMP,2),12,Nt/12);
         yr       = [1:Nt/12]+1879;
         % deviations from the corresponding 1951-1980 means.
+
     elseif en == 1
         file    = [dir,'GISTEMP_5x5_regridded.mat'];
         lon     = 2.5:5:360;
@@ -44,11 +50,16 @@ function [GISTEMP, lon, lat, yr] = CDC_load_GISTEMP(en)
         lon_high = lon_high([91:end 1:90]);    
         lon_high(lon_high<0) = lon_high(lon_high<0) + 360;
 
-        
         lon      = 2.5:5:360;
         lat      = -87.5:5:90;
         GISTEMP  = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat);
-        Nt       = fix(size(GISTEMP,3)/12)*12;
+
+        if rem(size(GISTEMP,3),12) == 0
+            Nt  = size(GISTEMP,3);
+        else
+            Nt  = ceil(size(GISTEMP,3)/12)*12;
+            GISTEMP(:,:,(end+1):Nt) = nan;
+        end
         GISTEMP  = reshape(GISTEMP(:,:,1:Nt),size(GISTEMP,1),size(GISTEMP,2),12,Nt/12);
         yr       = [1:Nt/12]+1879;   
         
