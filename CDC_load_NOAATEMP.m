@@ -1,9 +1,4 @@
-% [GISTEMP, lon, lat, yr] = CDC_load_GISTEMP(en)
-% if en does not exist :: use land only data
-% if en == 1 :: use regridded data
-% if en == 2 :: use combined land-ocean data
-
-
+% [NOAATEMP, lon, lat, yr] = CDC_load_NOAATEMP
 function [NOAATEMP, lon, lat, yr] = CDC_load_NOAATEMP
 
     dir =  [CDC_other_temp_dir,'NOAAGlobalTemp/'];
@@ -15,7 +10,12 @@ function [NOAATEMP, lon, lat, yr] = CDC_load_NOAATEMP
     lat      = ncread(file,'lat');
     NOAATEMP = tas;
 
-    Nt       = fix(size(NOAATEMP,3)/12)*12;
+    if rem(size(NOAATEMP,3),12) == 0
+        Nt  = size(NOAATEMP,3);
+    else
+        Nt  = ceil(size(NOAATEMP,3)/12)*12;
+        NOAATEMP(:,:,(end+1):Nt) = nan;
+    end
     NOAATEMP = reshape(NOAATEMP(:,:,1:Nt),size(NOAATEMP,1),size(NOAATEMP,2),12,Nt/12);
     yr       = [1:Nt/12]+1879;
     

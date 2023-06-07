@@ -40,6 +40,7 @@ function [GISTEMP, lon, lat, yr] = CDC_load_GISTEMP(en)
             load(file);
         end
         GISTEMP = tas;
+        
     elseif en == 2
         file     = [dir,'gistemp1200_GHCNv4_ERSSTv5.nc'];
         tas      = ncread(file,'tempanomaly'); 
