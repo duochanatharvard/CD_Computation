@@ -72,7 +72,7 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
             errt = reshape(errt(:,:,1:Nt),72,36,12,Nt/12);
             sample1 = normrnd(0,errt);
 
-            sample2 = nan(size(sample1));
+            sample2 = zeros(size(sample1));
             for ct_yr = [1:Nt/12] + 1849
                 dir_err  = [dir,'HadCRUT5_error_covariance/'];
                 if rem(ct_yr,10) == 0, disp(num2str(ct_yr,'Start Year: %6.0f')); end
