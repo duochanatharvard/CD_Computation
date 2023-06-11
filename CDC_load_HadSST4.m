@@ -84,8 +84,9 @@ function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en,P)
             sample = sample1 + sample2;
             sample = sample([37:72 1:36],:,:,:);
 
-            P.do_random          = 0;
-            [HadSST4,lon,lat,~]  = CDC_load_HadSST4(en,P);
+            PP                   = P;
+            PP.do_random         = 0;
+            [HadSST4,lon,lat,~]  = CDC_load_HadSST4(en,PP);
             HadSST4              = HadSST4 + sample;
             save(file_HadSST4,'HadSST4','-v7.3')
 
