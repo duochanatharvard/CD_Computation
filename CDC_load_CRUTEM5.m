@@ -37,7 +37,7 @@ function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
             error('CRUTEM5 does not provide uncorrected estimates...')
             
         else
-            file = [dir,'CRUTEM5_Ensemble/CRUTEM.5.0.1.0_ensemble_member_',num2str(en),'.mat'];
+            file = [dir,'CRUTEM5_ensemble/CRUTEM.5.0.1.0_ensemble_member_',num2str(en),'.mat'];
             if ~isfile(file)
                 
                 PP.do_random = 0;
@@ -55,7 +55,7 @@ function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
             lat = -87.5:5:90;
             yr  = 1849 + [1:size(CRUTEM5,4)];
         end
-        
+
     else
 
         file_CRUTEM5 = [dir,'CRUTEM5_ensemble_perturbed/CRUTEM.5.0.1.0_perturbed_ensemble_member_',num2str(en),'.mat'];
