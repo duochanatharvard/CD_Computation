@@ -17,7 +17,7 @@ function [NOAATEMP, lon, lat, yr] = CDC_load_NOAATEMP
         NOAATEMP(:,:,(end+1):Nt) = nan;
     end
     NOAATEMP = reshape(NOAATEMP(:,:,1:Nt),size(NOAATEMP,1),size(NOAATEMP,2),12,Nt/12);
-    yr       = [1:Nt/12]+1879;
+    yr       = [1:Nt/12]+1849;
     
     [yr_start,yr_end] = CDC_common_time_interval;
     [NOAATEMP, yr] = CDC_trim_years(NOAATEMP, yr, yr_start, yr_end);
