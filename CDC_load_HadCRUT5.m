@@ -87,7 +87,7 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
                         D(D<0)       = 0;
                         tos_cov_temp = V*D*inv(V);
                         temp2    = mvnrnd(zeros(size(tos_cov_temp,1),1),tos_cov_temp);
-                        temp     = nan(size(tos_cov,1),1);
+                        temp     = zeros(size(tos_cov,1),1);
                         temp(l)  = temp2;
                         sample2(:,:,ct_mon,ct_yr-1849)   = reshape(temp,72,36);
                     catch
