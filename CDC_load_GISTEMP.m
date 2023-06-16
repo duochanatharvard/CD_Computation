@@ -33,7 +33,8 @@ function [GISTEMP, lon, lat, yr] = CDC_load_GISTEMP(en)
         
         if ~isfile(file)
             [tas, lon_high, lat_high, yr] = CDC_load_GISTEMP;
-            tas_5      = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat);
+            P.threshold = 1;
+            tas_5      = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat,P);
             tas        = reshape(tas_5,size(tas_5,1),size(tas_5,2),12,size(tas_5,3)/12);
             save(file,'tas','yr','-v7.3');
         else
@@ -53,7 +54,8 @@ function [GISTEMP, lon, lat, yr] = CDC_load_GISTEMP(en)
 
         lon      = 2.5:5:360;
         lat      = -87.5:5:90;
-        GISTEMP  = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat);
+        P.threshold = 1;
+        GISTEMP  = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat,P);
 
         if rem(size(GISTEMP,3),12) == 0
             Nt  = size(GISTEMP,3);

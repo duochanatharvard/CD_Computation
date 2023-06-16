@@ -38,7 +38,8 @@ function [ERSST5,lon,lat,yr] = CDC_load_ERSST5(en)
             if ~isfile(file)
                 
                 [sst,lon_high,lat_high,yr] = CDC_load_ERSST5;
-                sst = CDC_average_grid(lon_high',lat_high',sst(:,:,:),lon,lat);
+                P.threshold = 1;
+                sst = CDC_average_grid(lon_high',lat_high',sst(:,:,:),lon,lat,P);
                 sst = reshape(sst,size(sst,1),size(sst,2),12,size(sst,3)/12);
                 save(file,'sst','yr','-v7.3');
             else    

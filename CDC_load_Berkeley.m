@@ -31,7 +31,8 @@ function [Berkeley, lon, lat, yr] = CDC_load_Berkeley(en)
         
         if ~isfile(file)
             [tas, lon_high, lat_high, yr] = CDC_load_Berkeley;
-            tas_5      = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat);
+            P.threshold = 1;
+            tas_5      = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat,P);
             tas        = reshape(tas_5,size(tas_5,1),size(tas_5,2),12,size(tas_5,3)/12);
             save(file,'tas','yr','-v7.3');
         else
