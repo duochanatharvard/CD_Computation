@@ -3,6 +3,8 @@
 
 function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
 
+    data_version = '5.0.2.0';
+
     if ~exist('en','var'), en = 0; end
     dir         = [CDC_other_temp_dir,'CRUTEM5/'];
     if ~exist('P','var')
@@ -15,7 +17,7 @@ function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
 
     if en <= 0 || P.do_random == 0
         if en == 0
-            file = [dir,'CRUTEM.5.0.1.0.anomalies.nc'];
+            file = [dir,'CRUTEM.',data_version,'.anomalies.nc'];
             CRUTEM5 = ncread(file,'tas');
             lon     = ncread(file,'longitude');
             lat     = ncread(file,'latitude');
@@ -37,7 +39,7 @@ function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
             error('CRUTEM5 does not provide uncorrected estimates...')
             
         else
-            file = [dir,'CRUTEM5_ensemble/CRUTEM.5.0.1.0_ensemble_member_',num2str(en),'.mat'];
+            file = [dir,'CRUTEM5_ensemble/CRUTEM.',data_version,'_ensemble_member_',num2str(en),'.mat'];
             if ~isfile(file)
                 
                 PP.do_random = 0;
@@ -58,11 +60,11 @@ function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
 
     else
 
-        file_CRUTEM5 = [dir,'CRUTEM5_ensemble_perturbed/CRUTEM.5.0.1.0_perturbed_ensemble_member_',num2str(en),'.mat'];
+        file_CRUTEM5 = [dir,'CRUTEM5_ensemble_perturbed/CRUTEM.',data_version,'_perturbed_ensemble_member_',num2str(en),'.mat'];
         
         if ~isfile(file_CRUTEM5)
         
-            errt = ncread([dir,'CRUTEM.5.0.1.0.measurement_sampling.nc'],'tas_unc');
+            errt = ncread([dir,'CRUTEM.',data_version,'.measurement_sampling.nc'],'tas_unc');
 
             if rem(size(errt,3),12) == 0
                 Nt  = size(errt,3);

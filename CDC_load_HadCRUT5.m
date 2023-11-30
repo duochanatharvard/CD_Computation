@@ -4,6 +4,8 @@
 
 function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
 
+    data_version = '5.0.2.0';
+
     if ~exist('en','var'), en = 0; end
     if ~exist('P','var')
         if en <= 0
@@ -19,16 +21,16 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
 
         if en == 0
             if P.do_analysis == 0
-                file = [dir,'HadCRUT.5.0.1.0.anomalies.ensemble_mean.nc'];
+                file = [dir,'HadCRUT.',data_version,'.anomalies.ensemble_mean.nc'];
             else
-                file = [dir,'HadCRUT.5.0.1.0.analysis.anomalies.ensemble_mean.nc'];
+                file = [dir,'HadCRUT.',data_version,'.analysis.anomalies.ensemble_mean.nc'];
             end
         elseif en == -1
-            file = [dir,'HadCRUT.5.0.1.0.weights.nc'];
+            file = [dir,'HadCRUT.',data_version,'.weights.nc'];
             disp('HadCRUT5 does not provide uncorrected estimates,')
             disp('Loading weights for LATs and SSTs instead');
         else
-            file = [dir,'HadCRUT5_ensemble/HadCRUT.5.0.1.0.anomalies.',num2str(en),'.nc'];
+            file = [dir,'HadCRUT5_ensemble/HadCRUT.',data_version,'.anomalies.',num2str(en),'.nc'];
         end
     
         if en > 0
@@ -56,11 +58,11 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
 
     else
         
-        file_HadCRUT5 = [dir,'HadCRUT5_ensemble_perturbed/HadCRUT.5.0.1.0_perturbed_ensemble_member_',num2str(en),'.mat'];
+        file_HadCRUT5 = [dir,'HadCRUT5_ensemble_perturbed/HadCRUT.',data_version,'_perturbed_ensemble_member_',num2str(en),'.mat'];
         
         if ~isfile(file_HadCRUT5)
         
-            errt = ncread([dir,'HadCRUT.5.0.1.0.uncorrelated.nc'],'tas_unc');
+            errt = ncread([dir,'HadCRUT.',data_version,'.uncorrelated.nc'],'tas_unc');
 
             if rem(size(errt,3),12) == 0
                 Nt  = size(errt,3);
@@ -78,7 +80,7 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
                 if rem(ct_yr,10) == 0, disp(num2str(ct_yr,'Start Year: %6.0f')); end
                 for ct_mon = 1:12
                     try
-                        file_err = [dir_err,'HadCRUT.5.0.1.0.error_covariance.',num2str(ct_yr),CDF_num2str(ct_mon,2),'.nc'];
+                        file_err = [dir_err,'HadCRUT.',data_version,'.error_covariance.',num2str(ct_yr),CDF_num2str(ct_mon,2),'.nc'];
                         tos_cov  = ncread(file_err,'tas_cov');
                         tos_cov(isnan(tos_cov)) = 0;
                         l        = nanmean(tos_cov,1) ~= 0;

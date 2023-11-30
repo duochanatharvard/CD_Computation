@@ -3,6 +3,8 @@
 
 function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en,P)
 
+    data_version = '4.0.1.0';
+
     if ~exist('en','var'), en = 0;  end
     if ~exist('P','var')
         if en <= 0
@@ -14,11 +16,11 @@ function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en,P)
     dir    = [CDC_other_temp_dir,'HadSST4/'];
 
     if en == 0
-        file = [dir,'HadSST.4.0.1.0_median.nc'];
+        file = [dir,'HadSST.',data_version,'_median.nc'];
     elseif en == -1
-        file = [dir,'HadSST.4.0.1.0_unadjusted.nc'];
+        file = [dir,'HadSST.',data_version,'_unadjusted.nc'];
     else
-        file = [dir,'HadSST4_ensemble/HadSST.4.0.1.0_ensemble_member_',num2str(en),'.nc'];
+        file = [dir,'HadSST4_ensemble/HadSST.',data_version,'_ensemble_member_',num2str(en),'.nc'];
     end
 
     if en <= 0 || P.do_random == 0
@@ -42,12 +44,12 @@ function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en,P)
     
     else
         
-        file_HadSST4 = [dir,'HadSST4_ensemble_perturbed/HadSST.4.0.1.0_perturbed_ensemble_member_',num2str(en),'.mat'];
+        file_HadSST4 = [dir,'HadSST4_ensemble_perturbed/HadSST.',data_version,'_perturbed_ensemble_member_',num2str(en),'.mat'];
         
         if ~isfile(file_HadSST4)
         
-            err1 = ncread([dir,'HadSST.4.0.1.0_sampling_uncertainty.nc'],'tos_unc');
-            err2 = ncread([dir,'HadSST.4.0.1.0_uncorrelated_measurement_uncertainty.nc'],'tos_unc');
+            err1 = ncread([dir,'HadSST.',data_version,'_sampling_uncertainty.nc'],'tos_unc');
+            err2 = ncread([dir,'HadSST.',data_version,'_uncorrelated_measurement_uncertainty.nc'],'tos_unc');
 
             if rem(size(err1,3),12) == 0
                 Nt  = size(err1,3);
@@ -67,7 +69,7 @@ function [HadSST4,lon,lat,yr] = CDC_load_HadSST4(en,P)
                 if rem(ct_yr,10) == 0, disp(num2str(ct_yr,'Start Year: %6.0f')); end
                 for ct_mon = 1:12
                     try
-                        file_err = [dir_err,'HadSST.4.0.1.0_error_covariance_',num2str(ct_yr),CDF_num2str(ct_mon,2),'.nc'];
+                        file_err = [dir_err,'HadSST.',data_version,'_error_covariance_',num2str(ct_yr),CDF_num2str(ct_mon,2),'.nc'];
                         tos_cov  = ncread(file_err,'tos_cov');
                         l        = nanmean(tos_cov,1) ~= 0;
                         tos_cov_temp = tos_cov(l,l);
