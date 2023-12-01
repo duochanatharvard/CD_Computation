@@ -43,6 +43,7 @@ function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
             if ~isfile(file)
                 
                 PP.do_random = 0;
+                PP.do_analysis = 0;
                 w        = CDC_load_HadCRUT5(-1,PP);
                 HadCRUT5 = CDC_load_HadCRUT5(en,PP);
                 HadSST4  = CDC_load_HadSST4(en,PP);
