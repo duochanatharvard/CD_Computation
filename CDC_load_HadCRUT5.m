@@ -40,6 +40,8 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
                     data_version,'analysis.anomalies.',num2str(en),'.nc'];
             end
         end
+
+        disp(file);
     
         if en > 0
             HadCRUT5 = ncread(file,'tas');
