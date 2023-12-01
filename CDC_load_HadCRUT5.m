@@ -37,7 +37,7 @@ function [HadCRUT5,lon,lat,yr] = CDC_load_HadCRUT5(en,P)
                     data_version,'.anomalies.',num2str(en),'.nc'];
             else
                 file = [dir,'HadCRUT5_analysis_ensemble/HadCRUT.',...
-                    data_version,'analysis.anomalies.',num2str(en),'.nc'];
+                    data_version,'.analysis.anomalies.',num2str(en),'.nc'];
             end
         end
 
