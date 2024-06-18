@@ -33,7 +33,7 @@ function [Berkeley, lon, lat, yr] = CDC_load_Berkeley_global(do_ocn,do_regrid)
         yr       = [1:Nt/12]+1849;
         
         % deviations from the corresponding 1951-1980 means.
-        
+
     else
         if do_ocn == 1
             file    = [dir,'Berkeley_global_ocean_5x5_regridded.mat'];
@@ -44,7 +44,7 @@ function [Berkeley, lon, lat, yr] = CDC_load_Berkeley_global(do_ocn,do_regrid)
         lat     = -87.5:5:90;
         
         if ~isfile(file)
-            [tas, lon_high, lat_high, yr] = CDC_load_Berkeley;
+            [tas, lon_high, lat_high, yr] = CDC_load_Berkeley_global(do_ocn,0);
             P.threshold = 1;
             tas_5      = CDC_average_grid(lon_high,lat_high,tas(:,:,:),lon,lat,P);
             tas        = reshape(tas_5,size(tas_5,1),size(tas_5,2),12,size(tas_5,3)/12);
