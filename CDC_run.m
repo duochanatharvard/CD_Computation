@@ -17,14 +17,23 @@ function output = CDC_run(input,N,dim)
 
     NN = size(input,dim);
     if rem(N,2) == 0
-        error('N has to be an odd number');
+        Nh = floor(N / 2);  % Half window size
+        % error('N has to be an odd number');
     else
-        Nh = (N + 1)/2;
+        Nh = (N - 1)/2;
     end
 
     for ct = 1:NN
 
-        list            = (-Nh:Nh) + ct;
+        if rem(N, 2) == 0
+            % Even case: center the window such that ct is at N/2
+            list = (ct - Nh):(ct + Nh - 1);
+            % list = (ct - Nh + 1):(ct + Nh);
+        else
+            % Odd case: center the window such that ct is at the center
+            list = (ct - Nh):(ct + Nh);
+        end
+
         list(list < 1)  = [];
         list(list > NN) = [];
         
