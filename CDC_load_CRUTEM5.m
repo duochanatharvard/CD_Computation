@@ -1,4 +1,5 @@
 % [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
+% P.do_random = 0; CRUTEM5 = CDC_load_CRUTEM5(en,P);
 % P.do_random :: use ensemble members additionally perturbed for random errors
 
 function [CRUTEM5,lon,lat,yr] = CDC_load_CRUTEM5(en,P)
